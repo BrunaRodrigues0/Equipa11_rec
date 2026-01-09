@@ -22,6 +22,7 @@ public class User {
     private Long id;
 
     private String name;
+    private String role;
 
     @Column(unique = true)
     private String email;
@@ -34,10 +35,11 @@ public class User {
 
     public User() {}
 
-    public User(String name, String email, String password) {
+    public User(String name, String email, String password, String role) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.role = role;
     }
 
     // Getters e Setters
@@ -51,4 +53,6 @@ public class User {
     public void setPassword(String password) { this.password = password; }
     public List<Despesa> getDespesas() { return despesas; }
     public void setDespesas(List<Despesa> despesas) { this.despesas = despesas; }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; } 
 }

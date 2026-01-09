@@ -25,6 +25,10 @@ public class Despesa {
     @JoinColumn(name = "utilizador_id")
     private User utilizador;
 
+    @ManyToOne // Relação Many-to-One com a Categoria
+    @JoinColumn(name = "categoria_id")
+    private Category categoria;
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -72,5 +76,13 @@ public class Despesa {
 
     public void setUtilizador(User utilizador) {
         this.utilizador = utilizador;
+    }
+
+    public Category getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Category categoria) {
+        this.categoria = categoria;
     }
 }
