@@ -79,4 +79,10 @@ public class DespesaService {
         despesaRepository.save(existente);
         return "Despesa editada com sucesso!"; 
     }
+    // US8:
+    public Despesa buscarPorId(Long id) {
+        return despesaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Despesa não encontrada"));
+    }
+   
 }

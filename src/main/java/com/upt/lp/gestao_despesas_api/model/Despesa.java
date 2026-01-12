@@ -28,8 +28,9 @@ public class Despesa {
     @ManyToOne // Relação Many-to-One com a Categoria
     @JoinColumn(name = "categoria_id")
     private Category categoria;
+  
 
-    // Getters and Setters
+   // Getters and Setters
     public Long getId() {
         return id;
     }

@@ -11,13 +11,21 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/registar")
-    public User registar(@RequestBody User user) {
-        return userService.registar(user);
+   @PostMapping("/registar")
+    public String registar(@RequestBody User user) {
+        userService.registar(user);
+        return "Utilizador registado com sucesso!";
     }
+
 
     @PostMapping("/login")
     public User login(@RequestParam String email, @RequestParam String password) {
         return userService.login(email, password);
     }
+    
+    @PostMapping("/logout")
+    public String logout() {
+        return "Sessão terminada com sucesso";
+    }
+
 }
