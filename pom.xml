@@ -14,7 +14,7 @@
     <description>API REST para o projeto de Gestao de Despesas Pessoais</description>
 
     <properties>
-        <java.version>25</java.version> </properties>
+        <java.version>21</java.version> </properties>
 
     <dependencies>
         <dependency>
@@ -50,6 +50,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.upt.lp.gestao_despesas_api.client.MainClient</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>

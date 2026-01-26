@@ -23,7 +23,7 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    // US9: Criar categoria (Recebe o role por Header ou Param para validar se é ADMIN)
+    // US9: Criar categoria 
     @PostMapping
     public String criar(@RequestBody Category category, @RequestParam String role) {
         return categoryService.guardar(category, role);
