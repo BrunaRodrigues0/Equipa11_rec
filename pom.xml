@@ -51,7 +51,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.upt.lp.gestao_despesas_api.client.MainClient</mainClass>
+                    <mainClass>com.upt.lp.gestao_despesas_api.Equipa11ExpensesApiApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>

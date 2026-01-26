@@ -26,7 +26,7 @@ public class Category {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "categoria")
     @JsonIgnore
     private List<Despesa> despesas;
 
