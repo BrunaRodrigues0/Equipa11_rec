@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -33,10 +32,12 @@ public class Main {
         return args -> {
             boolean sair = false;
 
+            System.out.println("\n=== SISTEMA DE GESTAO DE DESPESAS ===");
+            System.out.println("Equipa 11 - UPT - 2025");
+            System.out.println("User Stories US1-US17");
+
             while (!sair) {
                 limparConsola();
-                mostrarCabecalho();
-
                 if (utilizadorLogado == null) {
                     sair = menuSemLogin(userService);
                 } else {
@@ -44,49 +45,40 @@ public class Main {
                 }
             }
 
-            System.out.println("\n👋 Até breve!");
+            System.out.println("\nSessao encerrada. Ate breve!");
             scanner.close();
         };
     }
 
-    // ==================== MENUS ====================
+    // ==================== MENUS PRINCIPAIS ====================
 
     private static boolean menuSemLogin(UserService userService) {
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║          MENU PRINCIPAL                ║");
-        System.out.println("╚════════════════════════════════════════╝");
-        System.out.println("1. 🔐 Login");
-        System.out.println("2. 📝 Registar novo utilizador");
-        System.out.println("0. 🚪 Sair");
-        System.out.print("\nEscolha uma opção: ");
+        System.out.println("\n--- MENU PRINCIPAL ---");
+        System.out.println("1. Login");
+        System.out.println("2. Criar conta");
+        System.out.println("0. Sair");
+        System.out.print("\nEscolha: ");
 
         int opcao = lerInteiro();
 
         switch (opcao) {
-            case 1:
-                fazerLogin(userService);
-                break;
-            case 2:
-                registarUtilizador(userService);
-                break;
-            case 0:
-                return true;
-            default:
-                System.out.println("❌ Opção inválida!");
+            case 1: autenticarUtilizador(userService); break;
+            case 2: criarConta(userService); break;
+            case 0: return true;
+            default: 
+                System.out.println("Opcao invalida!");
                 pausar();
         }
-
         return false;
     }
 
     private static boolean menuComLogin(UserService userService, CategoryService categoryService, 
                                        DespesaService despesaService) {
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║  👤 " + utilizadorLogado.getName());
-        System.out.println("║  📧 " + utilizadorLogado.getEmail());
-        System.out.println("║  🎭 " + utilizadorLogado.getRole());
-        System.out.println("╚════════════════════════════════════════╝");
-        System.out.println();
+        System.out.println("\n--- SESSAO ATIVA ---");
+        System.out.println("Utilizador: " + utilizadorLogado.getName());
+        System.out.println("Email: " + utilizadorLogado.getEmail());
+        System.out.println("Perfil: " + utilizadorLogado.getRole());
+        System.out.println("--------------------");
 
         if ("ADMIN".equals(utilizadorLogado.getRole())) {
             return menuAdmin(categoryService, despesaService);
@@ -96,570 +88,66 @@ public class Main {
     }
 
     private static boolean menuAdmin(CategoryService categoryService, DespesaService despesaService) {
-        System.out.println("📋 MENU ADMINISTRADOR");
-        System.out.println("─────────────────────");
-        System.out.println("1. 📁 Gerir Categorias");
-        System.out.println("2. 💰 Gerir Minhas Despesas");
-        System.out.println("3. 🔓 Logout");
-        System.out.println("0. 🚪 Sair");
-        System.out.print("\nEscolha uma opção: ");
+        System.out.println("1. Gerir despesas");
+        System.out.println("2. Gerir categorias");
+        System.out.println("3. Filtros e analise");
+        System.out.println("4. Logout");
+        System.out.println("0. Sair");
+        System.out.print("\nEscolha: ");
 
         int opcao = lerInteiro();
-
         switch (opcao) {
-            case 1:
-                menuCategorias(categoryService);
-                break;
-            case 2:
-                menuDespesas(despesaService, categoryService);
-                break;
-            case 3:
-                utilizadorLogado = null;
-                System.out.println("✓ Logout efetuado com sucesso!");
-                pausar();
-                break;
-            case 0:
-                return true;
-            default:
-                System.out.println("❌ Opção inválida!");
-                pausar();
+            case 1: menuDespesas(despesaService, categoryService); break;
+            case 2: menuCategorias(categoryService, despesaService); break;
+            case 3: menuFiltrosAnalise(despesaService, categoryService); break;
+            case 4: terminarSessao(); break;
+            case 0: return true;
+            default: System.out.println("Opcao invalida!"); pausar();
         }
-
         return false;
     }
 
     private static boolean menuUser(DespesaService despesaService, CategoryService categoryService) {
-        System.out.println("📋 MENU UTILIZADOR");
-        System.out.println("──────────────────");
-        System.out.println("1. 💰 Gerir Despesas");
-        System.out.println("2. 📊 Consultar Estatísticas");
-        System.out.println("3. 🔓 Logout");
-        System.out.println("0. 🚪 Sair");
-        System.out.print("\nEscolha uma opção: ");
+        System.out.println("1. Gerir despesas");
+        System.out.println("2. Filtros e analise");
+        System.out.println("3. Ver categorias");
+        System.out.println("4. Logout");
+        System.out.println("0. Sair");
+        System.out.print("\nEscolha: ");
 
         int opcao = lerInteiro();
-
         switch (opcao) {
-            case 1:
-                menuDespesas(despesaService, categoryService);
-                break;
-            case 2:
-                menuEstatisticas(despesaService, categoryService);
-                break;
-            case 3:
-                utilizadorLogado = null;
-                System.out.println("✓ Logout efetuado com sucesso!");
-                pausar();
-                break;
-            case 0:
-                return true;
-            default:
-                System.out.println("❌ Opção inválida!");
-                pausar();
+            case 1: menuDespesas(despesaService, categoryService); break;
+            case 2: menuFiltrosAnalise(despesaService, categoryService); break;
+            case 3: verTodasCategorias(categoryService); break;
+            case 4: terminarSessao(); break;
+            case 0: return true;
+            default: System.out.println("Opcao invalida!"); pausar();
         }
-
         return false;
     }
 
-    // ==================== CATEGORIAS ====================
+    // ==================== CRIAR CONTA ====================
 
-    private static void menuCategorias(CategoryService categoryService) {
+    private static void criarConta(UserService userService) {
         limparConsola();
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║       GESTÃO DE CATEGORIAS             ║");
-        System.out.println("╚════════════════════════════════════════╝");
-        System.out.println("1. ➕ Criar nova categoria");
-        System.out.println("2. 📋 Listar todas as categorias");
-        System.out.println("3. ✏️  Editar categoria");
-        System.out.println("4. 🗑️  Eliminar categoria");
-        System.out.println("0. ⬅️  Voltar");
-        System.out.print("\nEscolha uma opção: ");
-
-        int opcao = lerInteiro();
-
-        switch (opcao) {
-            case 1:
-                criarCategoria(categoryService);
-                break;
-            case 2:
-                listarCategorias(categoryService);
-                break;
-            case 3:
-                editarCategoria(categoryService);
-                break;
-            case 4:
-                eliminarCategoria(categoryService);
-                break;
-            case 0:
-                break;
-            default:
-                System.out.println("❌ Opção inválida!");
-                pausar();
-        }
-    }
-
-    private static void criarCategoria(CategoryService categoryService) {
-        limparConsola();
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║         CRIAR CATEGORIA                ║");
-        System.out.println("╚════════════════════════════════════════╝");
-
-        System.out.print("Nome da categoria: ");
-        String nome = scanner.nextLine();
-
-        Category categoria = new Category();
-        categoria.setNome(nome);
-
-        String resultado = categoryService.guardar(categoria, utilizadorLogado.getRole());
-        System.out.println("\n" + resultado);
-        pausar();
-    }
-
-    private static void listarCategorias(CategoryService categoryService) {
-        limparConsola();
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║       LISTA DE CATEGORIAS              ║");
-        System.out.println("╚════════════════════════════════════════╝\n");
-
-        List<Category> categorias = categoryService.listarTodas();
-
-        if (categorias.isEmpty()) {
-            System.out.println("⚠️  Não existem categorias registadas.");
-        } else {
-            System.out.printf("%-5s %-30s%n", "ID", "NOME");
-            System.out.println("─────────────────────────────────────");
-            for (Category cat : categorias) {
-                System.out.printf("%-5d %-30s%n", cat.getId(), cat.getNome());
-            }
-        }
-
-        pausar();
-    }
-
-    private static void editarCategoria(CategoryService categoryService) {
-        limparConsola();
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║        EDITAR CATEGORIA                ║");
-        System.out.println("╚════════════════════════════════════════╝\n");
-
-        listarCategorias(categoryService);
-
-        System.out.print("\nID da categoria a editar: ");
-        Long id = lerLong();
-
-        System.out.print("Novo nome: ");
-        String novoNome = scanner.nextLine();
-
-        Category novaDados = new Category();
-        novaDados.setNome(novoNome);
-
-        String resultado = categoryService.editar(id, novaDados, utilizadorLogado.getRole());
-        System.out.println("\n" + resultado);
-        pausar();
-    }
-
-    private static void eliminarCategoria(CategoryService categoryService) {
-        limparConsola();
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║       ELIMINAR CATEGORIA               ║");
-        System.out.println("╚════════════════════════════════════════╝\n");
-
-        listarCategorias(categoryService);
-
-        System.out.print("\nID da categoria a eliminar: ");
-        Long id = lerLong();
-
-        System.out.print("⚠️  Tem a certeza? (S/N): ");
-        String confirmacao = scanner.nextLine();
-
-        if (confirmacao.equalsIgnoreCase("S")) {
-            String resultado = categoryService.eliminar(id, utilizadorLogado.getRole());
-            System.out.println("\n" + resultado);
-        } else {
-            System.out.println("❌ Operação cancelada.");
-        }
-
-        pausar();
-    }
-
-    // ==================== DESPESAS ====================
-
-    private static void menuDespesas(DespesaService despesaService, CategoryService categoryService) {
-        limparConsola();
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║        GESTÃO DE DESPESAS              ║");
-        System.out.println("╚════════════════════════════════════════╝");
-        System.out.println("1. ➕ Registar nova despesa");
-        System.out.println("2. 📋 Listar minhas despesas");
-        System.out.println("3. 🔍 Filtrar despesas");
-        System.out.println("4. ✏️  Editar despesa");
-        System.out.println("5. 🗑️  Eliminar despesa");
-        System.out.println("0. ⬅️  Voltar");
-        System.out.print("\nEscolha uma opção: ");
-
-        int opcao = lerInteiro();
-
-        switch (opcao) {
-            case 1:
-                registarDespesa(despesaService, categoryService);
-                break;
-            case 2:
-                listarDespesas(despesaService);
-                break;
-            case 3:
-                filtrarDespesas(despesaService, categoryService);
-                break;
-            case 4:
-                editarDespesa(despesaService, categoryService);
-                break;
-            case 5:
-                eliminarDespesa(despesaService);
-                break;
-            case 0:
-                break;
-            default:
-                System.out.println("❌ Opção inválida!");
-                pausar();
-        }
-    }
-
-    private static void registarDespesa(DespesaService despesaService, CategoryService categoryService) {
-        limparConsola();
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║       REGISTAR DESPESA                 ║");
-        System.out.println("╚════════════════════════════════════════╝\n");
-
-        // Listar categorias disponíveis
-        List<Category> categorias = categoryService.listarTodas();
-        if (categorias.isEmpty()) {
-            System.out.println("⚠️  Não existem categorias. Contacte um administrador.");
-            pausar();
-            return;
-        }
-
-        System.out.println("Categorias disponíveis:");
-        for (int i = 0; i < categorias.size(); i++) {
-            System.out.println((i + 1) + ". " + categorias.get(i).getNome());
-        }
-
-        System.out.print("\nEscolha a categoria (número): ");
-        int catIndex = lerInteiro() - 1;
-
-        if (catIndex < 0 || catIndex >= categorias.size()) {
-            System.out.println("❌ Categoria inválida!");
-            pausar();
-            return;
-        }
-
-        System.out.print("Valor (€): ");
-        double valor = lerDouble();
-
-        System.out.print("Data (dd/MM/yyyy) ou ENTER para hoje: ");
-        String dataStr = scanner.nextLine();
-        LocalDate data = LocalDate.now();
-        if (!dataStr.trim().isEmpty()) {
-            try {
-                data = LocalDate.parse(dataStr, DATE_FORMATTER);
-            } catch (DateTimeParseException e) {
-                System.out.println("⚠️  Data inválida, usando data de hoje.");
-            }
-        }
-
-        System.out.print("Método de pagamento: ");
-        String metodo = scanner.nextLine();
-
-        System.out.print("Descrição: ");
-        String descricao = scanner.nextLine();
-
-        Despesa despesa = new Despesa();
-        despesa.setUtilizador(utilizadorLogado);
-        despesa.setCategoria(categorias.get(catIndex));
-        despesa.setValor(valor);
-        despesa.setData(data);
-        despesa.setMetodoPagamento(metodo);
-        despesa.setDescricao(descricao);
-
-        try {
-            despesa = despesaService.guardar(despesa);
-            System.out.println("\n✓ Despesa registada com sucesso! (ID: " + despesa.getId() + ")");
-        } catch (RuntimeException e) {
-            System.out.println("\n❌ Erro: " + e.getMessage());
-        }
-
-        pausar();
-    }
-
-    private static void listarDespesas(DespesaService despesaService) {
-        limparConsola();
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║         MINHAS DESPESAS                ║");
-        System.out.println("╚════════════════════════════════════════╝\n");
-
-        List<Despesa> despesas = despesaService.listarPorUtilizador(utilizadorLogado.getId());
-
-        if (despesas.isEmpty()) {
-            System.out.println("⚠️  Não existem despesas registadas.");
-        } else {
-            System.out.printf("%-5s %-12s %-10s %-15s %-15s %-25s%n", 
-                "ID", "DATA", "VALOR", "CATEGORIA", "PAGAMENTO", "DESCRIÇÃO");
-            System.out.println("─────────────────────────────────────────────────────────────────────────────");
-
-            double total = 0;
-            for (Despesa d : despesas) {
-                System.out.printf("%-5d %-12s €%-9.2f %-15s %-15s %-25s%n",
-                    d.getId(),
-                    d.getData().format(DATE_FORMATTER),
-                    d.getValor(),
-                    d.getCategoria().getNome(),
-                    d.getMetodoPagamento(),
-                    d.getDescricao());
-                total += d.getValor();
-            }
-
-            System.out.println("─────────────────────────────────────────────────────────────────────────────");
-            System.out.printf("TOTAL: €%.2f%n", total);
-        }
-
-        pausar();
-    }
-
-    private static void filtrarDespesas(DespesaService despesaService, CategoryService categoryService) {
-        limparConsola();
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║       FILTRAR DESPESAS                 ║");
-        System.out.println("╚════════════════════════════════════════╝\n");
-
-        System.out.print("Data início (dd/MM/yyyy) ou ENTER para ignorar: ");
-        String dataInicioStr = scanner.nextLine();
-        LocalDate dataInicio = null;
-        if (!dataInicioStr.trim().isEmpty()) {
-            try {
-                dataInicio = LocalDate.parse(dataInicioStr, DATE_FORMATTER);
-            } catch (DateTimeParseException e) {
-                System.out.println("⚠️  Data inválida.");
-            }
-        }
-
-        System.out.print("Data fim (dd/MM/yyyy) ou ENTER para ignorar: ");
-        String dataFimStr = scanner.nextLine();
-        LocalDate dataFim = null;
-        if (!dataFimStr.trim().isEmpty()) {
-            try {
-                dataFim = LocalDate.parse(dataFimStr, DATE_FORMATTER);
-            } catch (DateTimeParseException e) {
-                System.out.println("⚠️  Data inválida.");
-            }
-        }
-
-        System.out.print("Valor mínimo (€) ou ENTER para ignorar: ");
-        String minStr = scanner.nextLine();
-        Double valorMin = minStr.trim().isEmpty() ? null : Double.parseDouble(minStr);
-
-        System.out.print("Valor máximo (€) ou ENTER para ignorar: ");
-        String maxStr = scanner.nextLine();
-        Double valorMax = maxStr.trim().isEmpty() ? null : Double.parseDouble(maxStr);
-
-        // Listar categorias disponíveis
-        List<Category> categorias = categoryService.listarTodas();
-        if (!categorias.isEmpty()) {
-            System.out.println("\nCategorias disponíveis:");
-            for (int i = 0; i < categorias.size(); i++) {
-                System.out.println((i + 1) + ". " + categorias.get(i).getNome() + " (ID: " + categorias.get(i).getId() + ")");
-            }
-        }
-
-        System.out.print("\nIDs das categorias (separados por vírgula) ou ENTER para ignorar: ");
-        String catStr = scanner.nextLine();
-        List<Long> categoriaIds = null;
-        if (!catStr.trim().isEmpty()) {
-            categoriaIds = new ArrayList<>();
-            String[] ids = catStr.split(",");
-            for (String id : ids) {
-                try {
-                    categoriaIds.add(Long.parseLong(id.trim()));
-                } catch (NumberFormatException e) {
-                    System.out.println("⚠️  ID inválido ignorado: " + id);
-                }
-            }
-        }
-
-        List<Despesa> despesas = despesaService.filtrarDespesas(
-            utilizadorLogado.getId(), dataInicio, dataFim, valorMin, valorMax, categoriaIds
-        );
-
-        System.out.println("\n📊 RESULTADOS:");
-        System.out.println("─────────────────────────────────────────────────────────────────────────────");
-
-        if (despesas.isEmpty()) {
-            System.out.println("⚠️  Nenhuma despesa encontrada com esses critérios.");
-        } else {
-            System.out.printf("%-5s %-12s %-10s %-15s %-25s%n", 
-                "ID", "DATA", "VALOR", "CATEGORIA", "DESCRIÇÃO");
-            System.out.println("─────────────────────────────────────────────────────────────────────────────");
-
-            double total = 0;
-            for (Despesa d : despesas) {
-                System.out.printf("%-5d %-12s €%-9.2f %-15s %-25s%n",
-                    d.getId(),
-                    d.getData().format(DATE_FORMATTER),
-                    d.getValor(),
-                    d.getCategoria().getNome(),
-                    d.getDescricao());
-                total += d.getValor();
-            }
-
-            System.out.println("─────────────────────────────────────────────────────────────────────────────");
-            System.out.printf("TOTAL: €%.2f | Despesas encontradas: %d%n", total, despesas.size());
-        }
-
-        pausar();
-    }
-
-    private static void editarDespesa(DespesaService despesaService, CategoryService categoryService) {
-        limparConsola();
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║         EDITAR DESPESA                 ║");
-        System.out.println("╚════════════════════════════════════════╝\n");
-
-        listarDespesas(despesaService);
-
-        System.out.print("\nID da despesa a editar: ");
-        Long id = lerLong();
-
-        // Listar categorias
-        List<Category> categorias = categoryService.listarTodas();
-        System.out.println("\nCategorias disponíveis:");
-        for (int i = 0; i < categorias.size(); i++) {
-            System.out.println((i + 1) + ". " + categorias.get(i).getNome());
-        }
-
-        System.out.print("\nEscolha a categoria (número): ");
-        int catIndex = lerInteiro() - 1;
-
-        System.out.print("Novo valor (€): ");
-        double valor = lerDouble();
-
-        System.out.print("Nova data (dd/MM/yyyy): ");
-        String dataStr = scanner.nextLine();
-        LocalDate data = LocalDate.parse(dataStr, DATE_FORMATTER);
-
-        System.out.print("Novo método de pagamento: ");
-        String metodo = scanner.nextLine();
-
-        System.out.print("Nova descrição: ");
-        String descricao = scanner.nextLine();
-
-        Despesa novaDespesa = new Despesa();
-        novaDespesa.setCategoria(categorias.get(catIndex));
-        novaDespesa.setValor(valor);
-        novaDespesa.setData(data);
-        novaDespesa.setMetodoPagamento(metodo);
-        novaDespesa.setDescricao(descricao);
-
-        String resultado = despesaService.editar(id, novaDespesa);
-        System.out.println("\n" + resultado);
-        pausar();
-    }
-
-    private static void eliminarDespesa(DespesaService despesaService) {
-        limparConsola();
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║        ELIMINAR DESPESA                ║");
-        System.out.println("╚════════════════════════════════════════╝\n");
-
-        listarDespesas(despesaService);
-
-        System.out.print("\nID da despesa a eliminar: ");
-        Long id = lerLong();
-
-        System.out.print("⚠️  Tem a certeza? (S/N): ");
-        String confirmacao = scanner.nextLine();
-
-        if (confirmacao.equalsIgnoreCase("S")) {
-            String resultado = despesaService.eliminar(id);
-            System.out.println("\n" + resultado);
-        } else {
-            System.out.println("❌ Operação cancelada.");
-        }
-
-        pausar();
-    }
-
-    // ==================== ESTATÍSTICAS ====================
-
-    private static void menuEstatisticas(DespesaService despesaService, CategoryService categoryService) {
-        limparConsola();
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║          ESTATÍSTICAS                  ║");
-        System.out.println("╚════════════════════════════════════════╝\n");
-
-        List<Category> categorias = categoryService.listarTodas();
+        System.out.println("--- CRIAR CONTA ---");
         
-        System.out.println("📊 TOTAL POR CATEGORIA:");
-        System.out.println("─────────────────────────────────────");
-
-        double grandTotal = 0;
-        for (Category cat : categorias) {
-            Double total = despesaService.calcularTotalPorCategoria(utilizadorLogado.getId(), cat.getId());
-            if (total > 0) {
-                System.out.printf("%-20s: €%.2f%n", cat.getNome(), total);
-                grandTotal += total;
-            }
-        }
-
-        System.out.println("─────────────────────────────────────");
-        System.out.printf("TOTAL GERAL: €%.2f%n", grandTotal);
-
-        pausar();
-    }
-
-    // ==================== LOGIN E REGISTO ====================
-
-    private static void fazerLogin(UserService userService) {
-        limparConsola();
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║              LOGIN                     ║");
-        System.out.println("╚════════════════════════════════════════╝\n");
-
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
-
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
-
-        try {
-            utilizadorLogado = userService.login(email, password);
-            System.out.println("\n✓ Login efetuado com sucesso!");
-            System.out.println("Bem-vindo, " + utilizadorLogado.getName() + "!");
-            pausar();
-        } catch (RuntimeException e) {
-            System.out.println("\n❌ " + e.getMessage());
-            pausar();
-        }
-    }
-
-    private static void registarUtilizador(UserService userService) {
-        limparConsola();
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║         REGISTO DE UTILIZADOR          ║");
-        System.out.println("╚════════════════════════════════════════╝\n");
-
         System.out.print("Nome: ");
-        String nome = scanner.nextLine();
+        String nome = scanner.nextLine().trim();
+        if (nome.isEmpty()) { System.out.println("Erro: Nome obrigatorio!"); pausar(); return; }
 
         System.out.print("Email: ");
-        String email = scanner.nextLine();
+        String email = scanner.nextLine().trim();
+        if (email.isEmpty() || !email.contains("@")) { System.out.println("Erro: Email invalido!"); pausar(); return; }
 
         System.out.print("Password: ");
         String password = scanner.nextLine();
+        if (password.length() < 3) { System.out.println("Erro: Password muito curta!"); pausar(); return; }
 
-        System.out.print("Role (USER/ADMIN): ");
-        String role = scanner.nextLine().toUpperCase();
-
-        if (!role.equals("USER") && !role.equals("ADMIN")) {
-            System.out.println("❌ Role inválida! Usando USER por defeito.");
-            role = "USER";
-        }
+        System.out.print("Perfil (USER/ADMIN): ");
+        String role = scanner.nextLine().toUpperCase().trim();
+        if (!role.equals("USER") && !role.equals("ADMIN")) role = "USER";
 
         User user = new User();
         user.setName(nome);
@@ -668,14 +156,701 @@ public class Main {
         user.setRole(role);
 
         try {
-            user = userService.registar(user);
-            System.out.println("\n✓ Utilizador registado com sucesso!");
-            System.out.println("ID: " + user.getId());
-            pausar();
+            userService.registar(user);
+            System.out.println("Registo efetuado com sucesso.");
         } catch (RuntimeException e) {
-            System.out.println("\n❌ " + e.getMessage());
-            pausar();
+            System.out.println("Erro: " + e.getMessage());
         }
+        pausar();
+    }
+
+    // ==================== AUTENTICAR ====================
+
+    private static void autenticarUtilizador(UserService userService) {
+        limparConsola();
+        System.out.println("--- LOGIN ---");
+        System.out.print("Email: ");
+        String email = scanner.nextLine().trim();
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
+
+        try {
+            utilizadorLogado = userService.login(email, password);
+            System.out.println("Sucesso: Login efetuado.");
+        } catch (RuntimeException e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+        pausar();
+    }
+
+    // ==================== TERMINAR SESSÃO ====================
+
+    private static void terminarSessao() {
+        System.out.println("A encerrar sessao...");
+        utilizadorLogado = null;
+        System.out.println("Logout concluido.");
+        pausar();
+    }
+
+    // ==================== GESTÃO DE CATEGORIAS ====================
+
+    private static void menuCategorias(CategoryService categoryService, DespesaService despesaService) {
+        limparConsola();
+        System.out.println("--- GESTAO DE CATEGORIAS ---");
+        System.out.println("1. Criar\n2. Editar\n3. Eliminar\n4. Listar\n0. Voltar");
+        System.out.print("\nEscolha: ");
+
+        int opcao = lerInteiro();
+        switch (opcao) {
+            case 1: criarCategoria(categoryService); break;
+            case 2: editarCategoria(categoryService); break;
+            case 3: eliminarCategoria(categoryService, despesaService); break;
+            case 4: verTodasCategorias(categoryService); break;
+        }
+    }
+
+    private static void criarCategoria(CategoryService categoryService) {
+        System.out.print("Nome da categoria: ");
+        String nome = scanner.nextLine().trim();
+        if (nome.isEmpty()) return;
+
+        Category cat = new Category();
+        cat.setNome(nome);
+        System.out.println(categoryService.guardar(cat, utilizadorLogado.getRole()));
+        pausar();
+    }
+
+    private static void editarCategoria(CategoryService categoryService) {
+        limparConsola();
+        System.out.println("--- EDITAR CATEGORIA ---");
+        
+        // Listar todas as categorias com ID e nome
+        List<Category> categorias = categoryService.listarTodas();
+        if (categorias.isEmpty()) {
+            System.out.println("Sem categorias registadas.");
+            pausar();
+            return;
+        }
+        
+        System.out.println("\nCategorias disponiveis:");
+        System.out.printf("%-5s %-30s%n", "ID", "NOME");
+        System.out.println("----------------------------------");
+        categorias.forEach(c -> System.out.printf("%-5d %-30s%n", c.getId(), c.getNome()));
+        
+        System.out.print("\nID da categoria a editar: ");
+        Long id = lerLong();
+        
+        if (id == -1L) {
+            System.out.println("ID invalido!");
+            pausar();
+            return;
+        }
+        
+        System.out.print("Novo nome: ");
+        String nome = scanner.nextLine().trim();
+        
+        if (nome.isEmpty()) {
+            System.out.println("Nome nao pode ser vazio!");
+            pausar();
+            return;
+        }
+
+        Category dados = new Category();
+        dados.setNome(nome);
+        System.out.println(categoryService.editar(id, dados, utilizadorLogado.getRole()));
+        pausar();
+    }
+
+    private static void eliminarCategoria(CategoryService categoryService, DespesaService despesaService) {
+        limparConsola();
+        System.out.println("--- ELIMINAR CATEGORIA ---");
+        
+        // Listar todas as categorias
+        List<Category> categorias = categoryService.listarTodas();
+        if (categorias.isEmpty()) {
+            System.out.println("Sem categorias registadas.");
+            pausar();
+            return;
+        }
+        
+        System.out.println("\nCategorias disponiveis:");
+        System.out.printf("%-5s %-30s%n", "ID", "NOME");
+        System.out.println("----------------------------------");
+        categorias.forEach(c -> System.out.printf("%-5d %-30s%n", c.getId(), c.getNome()));
+        
+        System.out.print("\nID da categoria a eliminar: ");
+        Long id = lerLong();
+        
+        if (id == -1L) {
+            System.out.println("ID invalido!");
+            pausar();
+            return;
+        }
+        
+        // Verificar se existem despesas associadas a esta categoria
+        List<Despesa> despesasCategoria = despesaService.listarPorUtilizador(utilizadorLogado.getId()).stream()
+            .filter(d -> d.getCategoria() != null && d.getCategoria().getId().equals(id))
+            .toList();
+        
+        if (!despesasCategoria.isEmpty()) {
+            System.out.println("\nAVISO: Existem " + despesasCategoria.size() + 
+                             " despesa(s) associada(s) a esta categoria.");
+            System.out.println("Ao eliminar a categoria, estas despesas ficarao sem categoria.");
+        }
+        
+        System.out.print("\nTem certeza que deseja eliminar? (S/N): ");
+        String confirmacao = scanner.nextLine().trim();
+        
+        if (confirmacao.equalsIgnoreCase("S")) {
+            try {
+                System.out.println(categoryService.eliminar(id, utilizadorLogado.getRole()));
+            } catch (Exception e) {
+                System.out.println("Erro ao eliminar categoria: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Operacao cancelada.");
+        }
+        pausar();
+    }
+
+    private static void verTodasCategorias(CategoryService categoryService) {
+        limparConsola();
+        System.out.println("--- LISTAR CATEGORIAS ---");
+        
+        List<Category> lista = categoryService.listarTodas();
+        if (lista.isEmpty()) {
+            System.out.println("\nSem categorias registadas.");
+        } else {
+            System.out.println();
+            System.out.printf("%-5s %-30s%n", "ID", "NOME");
+            System.out.println("----------------------------------");
+            lista.forEach(c -> System.out.printf("%-5d %-30s%n", c.getId(), c.getNome()));
+        }
+        pausar();
+    }
+
+    // ==================== GESTÃO DE DESPESAS ====================
+
+    private static void menuDespesas(DespesaService despesaService, CategoryService categoryService) {
+        limparConsola();
+        System.out.println("--- GESTAO DE DESPESAS ---");
+        System.out.println("1. Registar\n2. Editar\n3. Eliminar\n4. Listar\n5. Detalhes\n0. Voltar");
+        System.out.print("\nEscolha: ");
+
+        int opcao = lerInteiro();
+        switch (opcao) {
+            case 1: registarDespesa(despesaService, categoryService); break;
+            case 2: editarDespesa(despesaService, categoryService); break;
+            case 3: eliminarDespesa(despesaService); break;
+            case 4: verListaDespesas(despesaService); break;
+            case 5: verDetalhesDespesa(despesaService); break;
+        }
+    }
+
+    private static void registarDespesa(DespesaService despesaService, CategoryService categoryService) {
+        limparConsola();
+        System.out.println("--- REGISTAR DESPESA ---");
+        
+        List<Category> cats = categoryService.listarTodas();
+        if (cats.isEmpty()) { 
+            System.out.println("\nSem categorias disponiveis. Crie uma categoria primeiro."); 
+            pausar(); 
+            return; 
+        }
+
+        System.out.println("\nCategorias disponiveis:");
+        for (int i = 0; i < cats.size(); i++) {
+            System.out.println((i + 1) + ". " + cats.get(i).getNome());
+        }
+        
+        System.out.print("\nEscolha a categoria (numero): ");
+        int idx = lerInteiro() - 1;
+        
+        if (idx < 0 || idx >= cats.size()) {
+            System.out.println("Categoria invalida!");
+            pausar();
+            return;
+        }
+
+        System.out.print("Valor (EUR): ");
+        double valor = lerDouble();
+        
+        if (valor <= 0) {
+            System.out.println("Valor deve ser positivo!");
+            pausar();
+            return;
+        }
+        
+        System.out.print("Data (dd/MM/yyyy) ou vazio para hoje: ");
+        String dataStr = scanner.nextLine().trim();
+        LocalDate data;
+        
+        try {
+            data = dataStr.isEmpty() ? LocalDate.now() : LocalDate.parse(dataStr, DATE_FORMATTER);
+        } catch (DateTimeParseException e) {
+            System.out.println("Formato de data invalido!");
+            pausar();
+            return;
+        }
+
+        System.out.print("Metodo Pagamento: ");
+        String metodo = scanner.nextLine().trim();
+
+        Despesa d = new Despesa();
+        d.setUtilizador(utilizadorLogado);
+        d.setCategoria(cats.get(idx));
+        d.setValor(valor);
+        d.setData(data);
+        d.setMetodoPagamento(metodo);
+
+        try {
+            despesaService.guardar(d);
+            System.out.println("\nDespesa registada com sucesso!");
+        } catch (Exception e) {
+            System.out.println("Erro ao registar despesa: " + e.getMessage());
+        }
+        pausar();
+    }
+
+    private static void editarDespesa(DespesaService despesaService, CategoryService categoryService) {
+        limparConsola();
+        System.out.println("--- EDITAR DESPESA ---");
+        
+        // Mostrar lista de despesas do utilizador
+        List<Despesa> despesas = despesaService.listarPorUtilizador(utilizadorLogado.getId());
+        if (despesas.isEmpty()) {
+            System.out.println("\nSem despesas registadas.");
+            pausar();
+            return;
+        }
+        
+        System.out.println("\nSuas despesas:");
+        System.out.printf("%-5s %-12s %-10s %-15s %-15s%n", "ID", "DATA", "VALOR", "CATEGORIA", "PAGAMENTO");
+        System.out.println("----------------------------------------------------------------");
+        despesas.forEach(d -> System.out.printf("%-5d %-12s %-10.2f %-15s %-15s%n", 
+            d.getId(), 
+            d.getData().format(DATE_FORMATTER), 
+            d.getValor(), 
+            d.getCategoria() != null ? d.getCategoria().getNome() : "N/A",
+            d.getMetodoPagamento() != null ? d.getMetodoPagamento() : "N/A"));
+        
+        System.out.print("\nID da despesa a editar: ");
+        Long id = lerLong();
+        
+        if (id == -1L) {
+            System.out.println("ID invalido!");
+            pausar();
+            return;
+        }
+        
+        // Buscar a despesa
+        Despesa despesaExistente;
+        try {
+            despesaExistente = despesaService.buscarPorId(id);
+        } catch (RuntimeException e) {
+            System.out.println("Erro: " + e.getMessage());
+            pausar();
+            return;
+        }
+        
+        // Verificar se a despesa pertence ao utilizador
+        if (!despesaExistente.getUtilizador().getId().equals(utilizadorLogado.getId())) {
+            System.out.println("Erro: Nao tem permissao para editar esta despesa!");
+            pausar();
+            return;
+        }
+        
+        System.out.println("\n--- DADOS ATUAIS ---");
+        System.out.println("Valor: " + despesaExistente.getValor() + " EUR");
+        System.out.println("Data: " + despesaExistente.getData().format(DATE_FORMATTER));
+        System.out.println("Categoria: " + (despesaExistente.getCategoria() != null ? despesaExistente.getCategoria().getNome() : "N/A"));
+        System.out.println("Metodo Pagamento: " + (despesaExistente.getMetodoPagamento() != null ? despesaExistente.getMetodoPagamento() : "N/A"));
+        
+        System.out.println("\n--- NOVOS DADOS (deixe vazio para manter) ---");
+        
+        // Novo valor
+        System.out.print("Novo valor (EUR): ");
+        String valorStr = scanner.nextLine().trim();
+        Double novoValor = null;
+        if (!valorStr.isEmpty()) {
+            try {
+                novoValor = Double.parseDouble(valorStr);
+                if (novoValor <= 0) {
+                    System.out.println("Valor deve ser positivo!");
+                    pausar();
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Valor invalido!");
+                pausar();
+                return;
+            }
+        }
+        
+        // Nova data
+        System.out.print("Nova data (dd/MM/yyyy): ");
+        String dataStr = scanner.nextLine().trim();
+        LocalDate novaData = null;
+        if (!dataStr.isEmpty()) {
+            try {
+                novaData = LocalDate.parse(dataStr, DATE_FORMATTER);
+            } catch (DateTimeParseException e) {
+                System.out.println("Formato de data invalido!");
+                pausar();
+                return;
+            }
+        }
+        
+        // Nova categoria
+        List<Category> cats = categoryService.listarTodas();
+        Category novaCategoria = null;
+        
+        if (!cats.isEmpty()) {
+            System.out.println("\nCategorias disponiveis:");
+            for (int i = 0; i < cats.size(); i++) {
+                System.out.println((i + 1) + ". " + cats.get(i).getNome());
+            }
+            System.out.print("Nova categoria (numero) ou vazio para manter: ");
+            String catStr = scanner.nextLine().trim();
+            
+            if (!catStr.isEmpty()) {
+                try {
+                    int idx = Integer.parseInt(catStr) - 1;
+                    if (idx >= 0 && idx < cats.size()) {
+                        novaCategoria = cats.get(idx);
+                    }
+                } catch (NumberFormatException e) {
+                    // Mantém categoria atual
+                }
+            }
+        }
+        
+        // Novo método de pagamento
+        System.out.print("\nNovo metodo de pagamento: ");
+        String novoMetodo = scanner.nextLine().trim();
+        
+        // Criar objeto com novos dados
+        Despesa dadosNovos = new Despesa();
+        dadosNovos.setValor(novoValor != null ? novoValor : despesaExistente.getValor());
+        dadosNovos.setData(novaData != null ? novaData : despesaExistente.getData());
+        dadosNovos.setCategoria(novaCategoria != null ? novaCategoria : despesaExistente.getCategoria());
+        dadosNovos.setMetodoPagamento(!novoMetodo.isEmpty() ? novoMetodo : despesaExistente.getMetodoPagamento());
+        
+        // Editar
+        try {
+            String resultado = despesaService.editar(id, dadosNovos);
+            System.out.println("\n" + resultado);
+        } catch (Exception e) {
+            System.out.println("Erro ao editar: " + e.getMessage());
+        }
+        
+        pausar();
+    }
+
+    private static void eliminarDespesa(DespesaService despesaService) {
+        limparConsola();
+        System.out.println("--- ELIMINAR DESPESA ---");
+        
+        // Mostrar lista de despesas do utilizador
+        List<Despesa> despesas = despesaService.listarPorUtilizador(utilizadorLogado.getId());
+        if (despesas.isEmpty()) {
+            System.out.println("\nSem despesas registadas.");
+            pausar();
+            return;
+        }
+        
+        System.out.println("\nSuas despesas:");
+        System.out.printf("%-5s %-12s %-10s %-15s%n", "ID", "DATA", "VALOR", "CATEGORIA");
+        System.out.println("--------------------------------------------------");
+        despesas.forEach(d -> System.out.printf("%-5d %-12s %-10.2f %-15s%n", 
+            d.getId(), d.getData().format(DATE_FORMATTER), d.getValor(), 
+            d.getCategoria() != null ? d.getCategoria().getNome() : "N/A"));
+        
+        System.out.print("\nID da despesa a eliminar: ");
+        Long id = lerLong();
+        
+        if (id == -1L) {
+            System.out.println("ID invalido!");
+            pausar();
+            return;
+        }
+        
+        System.out.print("Tem certeza que deseja eliminar? (S/N): ");
+        if (scanner.nextLine().trim().equalsIgnoreCase("S")) {
+            try {
+                System.out.println(despesaService.eliminar(id));
+            } catch (Exception e) {
+                System.out.println("Erro ao eliminar: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Operacao cancelada.");
+        }
+        pausar();
+    }
+
+    private static void verListaDespesas(DespesaService despesaService) {
+        limparConsola();
+        System.out.println("--- LISTAR DESPESAS ---");
+        
+        List<Despesa> lista = despesaService.listarPorUtilizador(utilizadorLogado.getId());
+        if (lista.isEmpty()) {
+            System.out.println("\nSem despesas registadas.");
+        } else {
+            System.out.println();
+            System.out.printf("%-5s %-12s %-10s %-15s %-15s%n", "ID", "DATA", "VALOR", "CATEGORIA", "PAGAMENTO");
+            System.out.println("----------------------------------------------------------------");
+            lista.forEach(d -> System.out.printf("%-5d %-12s %-10.2f %-15s %-15s%n", 
+                d.getId(), 
+                d.getData().format(DATE_FORMATTER), 
+                d.getValor(), 
+                d.getCategoria() != null ? d.getCategoria().getNome() : "N/A",
+                d.getMetodoPagamento() != null ? d.getMetodoPagamento() : "N/A"));
+        }
+        pausar();
+    }
+
+    private static void verDetalhesDespesa(DespesaService despesaService) {
+        limparConsola();
+        System.out.println("--- DETALHES DA DESPESA ---");
+        
+        // Mostrar lista de despesas
+        List<Despesa> despesas = despesaService.listarPorUtilizador(utilizadorLogado.getId());
+        if (despesas.isEmpty()) {
+            System.out.println("\nSem despesas registadas.");
+            pausar();
+            return;
+        }
+        
+        System.out.println("\nSuas despesas:");
+        System.out.printf("%-5s %-12s %-10s %-15s%n", "ID", "DATA", "VALOR", "CATEGORIA");
+        System.out.println("--------------------------------------------------");
+        despesas.forEach(d -> System.out.printf("%-5d %-12s %-10.2f %-15s%n", 
+            d.getId(), 
+            d.getData().format(DATE_FORMATTER), 
+            d.getValor(), 
+            d.getCategoria() != null ? d.getCategoria().getNome() : "N/A"));
+        
+        System.out.print("\nID da despesa para ver detalhes: ");
+        Long id = lerLong();
+        
+        if (id == -1L) {
+            System.out.println("ID invalido!");
+            pausar();
+            return;
+        }
+        
+        // Buscar a despesa
+        Despesa despesa;
+        try {
+            despesa = despesaService.buscarPorId(id);
+        } catch (RuntimeException e) {
+            System.out.println("Erro: " + e.getMessage());
+            pausar();
+            return;
+        }
+        
+        // Verificar se a despesa pertence ao utilizador (ou se é admin)
+        if (!despesa.getUtilizador().getId().equals(utilizadorLogado.getId()) && 
+            !"ADMIN".equals(utilizadorLogado.getRole())) {
+            System.out.println("Erro: Nao tem permissao para ver esta despesa!");
+            pausar();
+            return;
+        }
+        
+        // Mostrar detalhes completos
+        limparConsola();
+        System.out.println("=== DETALHES COMPLETOS DA DESPESA ===");
+        System.out.println();
+        System.out.println("ID: " + despesa.getId());
+        System.out.println("Valor: " + String.format("%.2f EUR", despesa.getValor()));
+        System.out.println("Data: " + despesa.getData().format(DATE_FORMATTER));
+        System.out.println("Categoria: " + (despesa.getCategoria() != null ? despesa.getCategoria().getNome() : "N/A"));
+        System.out.println("Metodo Pagamento: " + (despesa.getMetodoPagamento() != null ? despesa.getMetodoPagamento() : "N/A"));
+        System.out.println("Descricao: " + (despesa.getDescricao() != null ? despesa.getDescricao() : "N/A"));
+        System.out.println("Utilizador: " + despesa.getUtilizador().getName() + " (" + despesa.getUtilizador().getEmail() + ")");
+        System.out.println();
+        System.out.println("=====================================");
+        
+        pausar();
+    }
+
+    // ==================== FILTROS E ANÁLISE ====================
+
+    private static void menuFiltrosAnalise(DespesaService despesaService, CategoryService categoryService) {
+        limparConsola();
+        System.out.println("--- FILTROS E ANALISE ---");
+        System.out.println("1. Filtrar despesas");
+        System.out.println("2. Total por Categoria");
+        System.out.println("0. Voltar");
+        System.out.print("\nEscolha: ");
+
+        int opcao = lerInteiro();
+        if (opcao == 1) filtrarDespesas(despesaService, categoryService);
+        else if (opcao == 2) verTotalPorCategoria(despesaService, categoryService);
+    }
+
+    private static void filtrarDespesas(DespesaService despesaService, CategoryService categoryService) {
+        limparConsola();
+        System.out.println("--- FILTRAR DESPESAS ---");
+        System.out.println("\nInsira os criterios de filtro (deixe vazio para ignorar):\n");
+        
+        // Filtro por categoria
+        List<Category> categorias = categoryService.listarTodas();
+        Long categoriaId = null;
+        
+        if (!categorias.isEmpty()) {
+            System.out.println("Categorias disponiveis:");
+            for (int i = 0; i < categorias.size(); i++) {
+                System.out.println((i + 1) + ". " + categorias.get(i).getNome());
+            }
+            System.out.print("\nEscolha a categoria (numero) ou deixe vazio: ");
+            String catInput = scanner.nextLine().trim();
+            
+            if (!catInput.isEmpty()) {
+                try {
+                    int idx = Integer.parseInt(catInput) - 1;
+                    if (idx >= 0 && idx < categorias.size()) {
+                        categoriaId = categorias.get(idx).getId();
+                    }
+                } catch (NumberFormatException e) {
+                    // Ignora entrada inválida
+                }
+            }
+        }
+        
+        // Filtro por data inicial
+        LocalDate dataInicio = null;
+        System.out.print("\nData inicial (dd/MM/yyyy) ou vazio: ");
+        String dataInicioStr = scanner.nextLine().trim();
+        
+        if (!dataInicioStr.isEmpty()) {
+            try {
+                dataInicio = LocalDate.parse(dataInicioStr, DATE_FORMATTER);
+            } catch (DateTimeParseException e) {
+                System.out.println("Formato de data invalido! Ignorando filtro de data inicial.");
+            }
+        }
+        
+        // Filtro por valor máximo
+        Double valorMaximo = null;
+        System.out.print("\nValor maximo (EUR) ou vazio: ");
+        String valorMaxStr = scanner.nextLine().trim();
+        
+        if (!valorMaxStr.isEmpty()) {
+            try {
+                valorMaximo = Double.parseDouble(valorMaxStr);
+            } catch (NumberFormatException e) {
+                System.out.println("Valor invalido! Ignorando filtro de valor maximo.");
+            }
+        }
+        
+        // Filtro por método de pagamento
+        System.out.print("\nMetodo de pagamento ou vazio: ");
+        String metodoPagamento = scanner.nextLine().trim();
+        if (metodoPagamento.isEmpty()) metodoPagamento = null;
+        
+        // Aplicar filtros
+        List<Despesa> todasDespesas = despesaService.listarPorUtilizador(utilizadorLogado.getId());
+        List<Despesa> despesasFiltradas = new ArrayList<>();
+        
+        for (Despesa d : todasDespesas) {
+            boolean passa = true;
+            
+            // Filtrar por categoria
+            if (categoriaId != null && (d.getCategoria() == null || 
+                !d.getCategoria().getId().equals(categoriaId))) {
+                passa = false;
+            }
+            
+            // Filtrar por data inicial
+            if (dataInicio != null && d.getData().isBefore(dataInicio)) {
+                passa = false;
+            }
+            
+            // Filtrar por valor máximo
+            if (valorMaximo != null && d.getValor() > valorMaximo) {
+                passa = false;
+            }
+            
+            // Filtrar por método de pagamento
+            if (metodoPagamento != null && !metodoPagamento.equalsIgnoreCase(d.getMetodoPagamento())) {
+                passa = false;
+            }
+            
+            if (passa) {
+                despesasFiltradas.add(d);
+            }
+        }
+        
+        // Mostrar resultados
+        System.out.println("\n--- RESULTADOS DA FILTRAGEM ---");
+        if (despesasFiltradas.isEmpty()) {
+            System.out.println("\nNenhuma despesa encontrada com os criterios especificados.");
+        } else {
+            System.out.println("\nForam encontradas " + despesasFiltradas.size() + " despesa(s):\n");
+            System.out.printf("%-5s %-12s %-10s %-15s %-15s%n", "ID", "DATA", "VALOR", "CATEGORIA", "PAGAMENTO");
+            System.out.println("----------------------------------------------------------------");
+            
+            double total = 0.0;
+            for (Despesa d : despesasFiltradas) {
+                System.out.printf("%-5d %-12s %-10.2f %-15s %-15s%n", 
+                    d.getId(), 
+                    d.getData().format(DATE_FORMATTER), 
+                    d.getValor(), 
+                    d.getCategoria() != null ? d.getCategoria().getNome() : "N/A",
+                    d.getMetodoPagamento() != null ? d.getMetodoPagamento() : "N/A");
+                total += d.getValor();
+            }
+            
+            System.out.println("----------------------------------------------------------------");
+            System.out.printf("TOTAL: %.2f EUR%n", total);
+        }
+        
+        pausar();
+    }
+
+    private static void verTotalPorCategoria(DespesaService despesaService, CategoryService categoryService) {
+        // Carregar os dados primeiro
+        List<Category> categorias = categoryService.listarTodas();
+        
+        if (categorias.isEmpty()) {
+            limparConsola();
+            System.out.println("--- TOTAL GASTO POR CATEGORIA ---\n");
+            System.out.println("Sem categorias registadas.");
+            pausar();
+            return;
+        }
+        
+        // Calcular todos os totais primeiro (isso vai gerar os logs do Hibernate)
+        double totalGeral = 0.0;
+        boolean temDespesas = false;
+        StringBuilder resultado = new StringBuilder();
+        
+        for (Category cat : categorias) {
+            Double total = despesaService.calcularTotalPorCategoria(utilizadorLogado.getId(), cat.getId());
+            
+            if (total != null && total > 0) {
+                resultado.append(String.format("%-30s %15.2f%n", cat.getNome(), total));
+                totalGeral += total;
+                temDespesas = true;
+            }
+        }
+        
+        // Agora limpar a consola e mostrar apenas o resultado final
+        limparConsola();
+        System.out.println("--- TOTAL GASTO POR CATEGORIA ---\n");
+        System.out.printf("%-30s %15s%n", "CATEGORIA", "TOTAL (EUR)");
+        System.out.println("------------------------------------------------");
+        
+        if (!temDespesas) {
+            System.out.println("\nSem despesas registadas.");
+        } else {
+            System.out.print(resultado.toString());
+            System.out.println("------------------------------------------------");
+            System.out.printf("%-30s %15.2f%n", "TOTAL GERAL", totalGeral);
+        }
+        
+        pausar();
     }
 
     // ==================== UTILITÁRIOS ====================
@@ -685,49 +860,35 @@ public class Main {
         System.out.flush();
     }
 
-    private static void mostrarCabecalho() {
-        System.out.println("╔════════════════════════════════════════╗");
-        System.out.println("║   SISTEMA DE GESTÃO DE DESPESAS        ║");
-        System.out.println("║         Equipa 11 - UPT                ║");
-        System.out.println("╚════════════════════════════════════════╝");
-        System.out.println();
-    }
-
     private static void pausar() {
-        System.out.print("\nPressione ENTER para continuar...");
+        System.out.print("\nPrima ENTER para continuar...");
         scanner.nextLine();
     }
 
     private static int lerInteiro() {
-        while (true) {
-            try {
-                int valor = Integer.parseInt(scanner.nextLine());
-                return valor;
-            } catch (NumberFormatException e) {
-                System.out.print("❌ Valor inválido. Tente novamente: ");
-            }
+        try { 
+            String input = scanner.nextLine().trim();
+            return input.isEmpty() ? -1 : Integer.parseInt(input);
+        } catch (Exception e) { 
+            return -1; 
         }
     }
 
     private static long lerLong() {
-        while (true) {
-            try {
-                long valor = Long.parseLong(scanner.nextLine());
-                return valor;
-            } catch (NumberFormatException e) {
-                System.out.print("❌ Valor inválido. Tente novamente: ");
-            }
+        try { 
+            String input = scanner.nextLine().trim();
+            return input.isEmpty() ? -1L : Long.parseLong(input);
+        } catch (Exception e) { 
+            return -1L; 
         }
     }
 
     private static double lerDouble() {
-        while (true) {
-            try {
-                double valor = Double.parseDouble(scanner.nextLine());
-                return valor;
-            } catch (NumberFormatException e) {
-                System.out.print("❌ Valor inválido. Tente novamente: ");
-            }
+        try { 
+            String input = scanner.nextLine().trim();
+            return input.isEmpty() ? 0.0 : Double.parseDouble(input);
+        } catch (Exception e) { 
+            return 0.0; 
         }
     }
 }

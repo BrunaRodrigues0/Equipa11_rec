@@ -84,5 +84,8 @@ public class DespesaService {
         return despesaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Despesa não encontrada"));
     }
+    public List<Despesa> listarTodas() {
+    return despesaRepository.findAll();
+}
    
 }
